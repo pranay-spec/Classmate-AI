@@ -14,7 +14,7 @@ ClassMate AI helps teachers in Haryana government schools deliver engaging, grad
 
 | Feature | Description |
 |---------|-------------|
-| **Live Concept Simplification** | Voice/text → STT → Gemini generates Hinglish explanation, key points, and text diagram |
+| **Live Concept Simplification** | Voice/text → STT → Groq AI generates Hinglish explanation, key points, and text diagram |
 | **Voice Triggered Quizzing** | "Create a quiz" or "Quiz me on X" → 4 MCQs, TTS read-aloud, scoring with highlights |
 
 ### Bonus
@@ -45,7 +45,7 @@ flowchart TB
     end
 
     subgraph AI["AI Engine"]
-        GEMINI[Gemini 2.5 Flash]
+        GROQ[Groq - Llama 3.3 70B]
     end
 
     subgraph Output["Classroom Output"]
@@ -63,10 +63,10 @@ flowchart TB
     MIC --> STT
     TXT --> INTENT
     STT --> INTENT
-    INTENT --> PROMPTS --> GEMINI
-    GEMINI --> EXPLAIN
-    GEMINI --> DIAGRAM
-    GEMINI --> QUIZ
+    INTENT --> PROMPTS --> GROQ
+    GROQ --> EXPLAIN
+    GROQ --> DIAGRAM
+    GROQ --> QUIZ
     EXPLAIN --> TTS
     QUIZ --> TTS
     EXPLAIN --> DB
@@ -85,7 +85,7 @@ classmate-ai/
 ├── assets/
 └── utils/
     ├── prompts.py          # System + task prompt templates
-    ├── gemini_helper.py    # Gemini 2.5 Flash API wrapper
+    ├── gemini_helper.py    # Groq API wrapper (Llama 3.3 70B)
     ├── speech.py           # Speech-to-text (Google STT)
     ├── tts.py              # Text-to-speech (gTTS)
     ├── quiz.py             # Quiz scoring logic
@@ -101,7 +101,7 @@ classmate-ai/
 
 - Python 3.10+
 - [FFmpeg](https://ffmpeg.org/) (required by pydub for audio conversion)
-- Google Gemini API key ([get one free](https://aistudio.google.com/apikey))
+- Groq API key ([get one free](https://console.groq.com/keys))
 
 ### Steps
 
@@ -125,7 +125,7 @@ pip install -r requirements.txt
 copy .env.example .env        # Windows
 # cp .env.example .env        # macOS/Linux
 
-# Edit .env and add your GEMINI_API_KEY
+# Edit .env and add your GROQ_API_KEY
 
 # 5. Run the app
 streamlit run app.py
@@ -182,7 +182,7 @@ Use the one-click demo buttons on the home screen for instant evaluation demos.
 5. Add secrets in **Advanced settings → Secrets**:
 
 ```toml
-GEMINI_API_KEY = "your_actual_api_key"
+GROQ_API_KEY = "your_actual_api_key"
 DEFAULT_LANGUAGE = "hinglish"
 DEFAULT_CLASS_LEVEL = "5"
 DATABASE_PATH = "data/classmate.db"
@@ -239,7 +239,7 @@ Explanations and quizzes use strict JSON schemas so the UI can reliably render k
 
 ### Intent Extraction
 
-Voice commands are first parsed by Gemini to detect:
+Voice commands are first parsed by Groq AI to detect:
 - `intent`: `explain` or `quiz`
 - `topic`: extracted subject
 - `class_level`: overridden if mentioned in speech
@@ -283,7 +283,7 @@ A local regex fallback (`speech.parse_voice_command`) handles offline/API-failur
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `GEMINI_API_KEY` | ✅ | — | Google Gemini API key |
+| `GROQ_API_KEY` | ✅ | — | Groq API key (free at console.groq.com) |
 | `DEFAULT_LANGUAGE` | ❌ | `hinglish` | Default language mode |
 | `DEFAULT_CLASS_LEVEL` | ❌ | `5` | Default class level |
 | `DATABASE_PATH` | ❌ | `data/classmate.db` | SQLite database path |
@@ -320,7 +320,7 @@ A local regex fallback (`speech.parse_voice_command`) handles offline/API-failur
 | Component | Technology |
 |-----------|------------|
 | Framework | Streamlit |
-| AI Model | Gemini 2.5 Flash (`google-genai` SDK) |
+| AI Model | Llama 3.3 70B via Groq API |
 | Speech-to-Text | Google Web Speech API (via SpeechRecognition) |
 | Text-to-Speech | gTTS |
 | Database | SQLite |
@@ -332,7 +332,7 @@ A local regex fallback (`speech.parse_voice_command`) handles offline/API-failur
 
 | Issue | Fix |
 |-------|-----|
-| `GEMINI_API_KEY is not set` | Create `.env` from `.env.example` and add your key |
+| `GROQ_API_KEY is not set` | Create `.env` from `.env.example` and add your Groq key |
 | Audio transcription fails | Check microphone permissions; use text input fallback |
 | `pydub` / audio errors | Install FFmpeg and add to system PATH |
 | gTTS not working | Ensure internet connection is active |
@@ -349,7 +349,8 @@ Built as an educational submission for Connecting Dreams Foundation. Free to use
 ## Acknowledgments
 
 - **Connecting Dreams Foundation** — for the mission to empower government school teachers
-- **Google Gemini** — for accessible AI for education
+- **Groq** — for ultra-fast, free AI inference
+- **Meta Llama** — for open-source AI models powering education
 - **Haryana's teachers** — whose daily challenges inspired every design decision
 
 *ClassMate AI — because every child deserves a great explanation.* 🌱

@@ -11,8 +11,8 @@ def format_api_error(exc: BaseException) -> str:
         )
     if any(x in msg for x in ("429", "rate limit", "resource exhausted", "quota")):
         return "API limit reach ho gayi (429). Thodi der wait karke phir try kijiye."
-    if any(x in msg for x in ("401", "403", "api key", "invalid")):
-        return "API key sahi nahi lag rahi. `.env` mein `GEMINI_API_KEY` check kijiye."
+    if any(x in msg for x in ("401", "403", "api key", "invalid", "authentication")):
+        return "API key sahi nahi lag rahi. `.env` mein `GROQ_API_KEY` check kijiye."
     if "timeout" in msg or "deadline" in msg:
         return "Request time out ho gayi. Internet check karke dubara try kijiye."
     return f"Kuch galat ho gaya: {exc}"

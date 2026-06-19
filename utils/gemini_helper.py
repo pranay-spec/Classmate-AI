@@ -1,4 +1,4 @@
-"""Gemini 2.5 Flash integration for ClassMate AI."""
+"""Groq LLM integration for ClassMate AI (replaces Gemini)."""
 
 import json
 import os
@@ -7,8 +7,7 @@ import time
 from typing import Any
 
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+from groq import Groq
 
 from utils.prompts import (
     build_explanation_prompt,
@@ -18,31 +17,31 @@ from utils.prompts import (
 
 load_dotenv()
 
-PRIMARY_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+PRIMARY_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 FALLBACK_MODELS = [
     PRIMARY_MODEL,
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
+    "llama-3.1-8b-instant",
+    "mixtral-8x7b-32768",
 ]
 # Deduplicate while preserving order
 FALLBACK_MODELS = list(dict.fromkeys(FALLBACK_MODELS))
 
-MAX_RETRIES = 4
-BASE_RETRY_DELAY_SEC = 2
+MAX_RETRIES = 3
+BASE_RETRY_DELAY_SEC = 1
 
 
 def _get_api_key() -> str:
-    key = os.getenv("GEMINI_API_KEY", "")
-    if not key or key == "your_gemini_api_key_here":
+    key = os.getenv("GROQ_API_KEY", "")
+    if not key or key == "your_groq_api_key_here":
         raise ValueError(
-            "GEMINI_API_KEY is not set. Add it to your .env file. "
-            "Get a key at https://aistudio.google.com/apikey"
+            "GROQ_API_KEY is not set. Add it to your .env file. "
+            "Get a free key at https://console.groq.com/keys"
         )
     return key
 
 
-def _get_client() -> genai.Client:
-    return genai.Client(api_key=_get_api_key())
+def _get_client() -> Groq:
+    return Groq(api_key=_get_api_key())
 
 
 def _is_retryable_error(exc: BaseException) -> bool:
@@ -71,15 +70,16 @@ def _generate(prompt: str, temperature: float = 0.7, max_tokens: int = 2048) -> 
     for model in FALLBACK_MODELS:
         for attempt in range(MAX_RETRIES):
             try:
-                response = client.models.generate_content(
+                response = client.chat.completions.create(
                     model=model,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        temperature=temperature,
-                        max_output_tokens=max_tokens,
-                    ),
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=temperature,
+                    max_completion_tokens=max_tokens,
+                    response_format={"type": "json_object"},
                 )
-                text = response.text or ""
+                text = response.choices[0].message.content or ""
                 if text.strip():
                     return text
                 raise ValueError("Empty response from AI model")
@@ -89,7 +89,7 @@ def _generate(prompt: str, temperature: float = 0.7, max_tokens: int = 2048) -> 
                     time.sleep(BASE_RETRY_DELAY_SEC * (2**attempt))
                     continue
                 if _is_retryable_error(exc):
-                    break
+                    break  # Try next model
                 raise
 
     if last_error:

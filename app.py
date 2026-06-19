@@ -119,13 +119,13 @@ def sidebar_controls():
         )
 
         api_configured = bool(
-            os.getenv("GEMINI_API_KEY")
-            and os.getenv("GEMINI_API_KEY") != "your_gemini_api_key_here"
+            os.getenv("GROQ_API_KEY")
+            and os.getenv("GROQ_API_KEY") != "your_groq_api_key_here"
         )
         if api_configured:
-            st.success("✅ Gemini API connected")
+            st.success("✅ Groq API connected")
         else:
-            st.error("❌ Add GEMINI_API_KEY to .env")
+            st.error("❌ Add GROQ_API_KEY to .env")
 
 
 def process_transcript(transcript: str):
