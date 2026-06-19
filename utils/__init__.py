@@ -1,0 +1,1 @@
+"""ClassMate AI utility modules."""
