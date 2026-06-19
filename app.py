@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 from utils.database import get_dashboard_data, init_db, log_activity
 from utils.errors import format_api_error
-from utils.gemini_helper import (
+from utils.groq_helper import (
     extract_intent_from_transcript,
     generate_explanation,
     generate_quiz,

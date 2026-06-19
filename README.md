@@ -40,7 +40,7 @@ flowchart TB
 
     subgraph Processing["Processing Layer"]
         STT[speech.py<br/>Google STT]
-        INTENT[gemini_helper.py<br/>Intent Extraction]
+        INTENT[groq_helper.py<br/>Intent Extraction]
         PROMPTS[prompts.py<br/>Grade + Language Templates]
     end
 
@@ -85,7 +85,7 @@ classmate-ai/
 ├── assets/
 └── utils/
     ├── prompts.py          # System + task prompt templates
-    ├── gemini_helper.py    # Groq API wrapper (Llama 3.3 70B)
+    ├── groq_helper.py      # Groq API wrapper (Llama 3.3 70B)
     ├── speech.py           # Speech-to-text (Google STT)
     ├── tts.py              # Text-to-speech (gTTS)
     ├── quiz.py             # Quiz scoring logic
